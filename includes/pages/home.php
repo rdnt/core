@@ -1,5 +1,6 @@
 Home
-<form id="form">
-    <input name="variable">
+<form id="login">
+    <input name="password">
     <input type="submit">
+    <? $core->csrf("/api/endpoint") ?>
 </form>

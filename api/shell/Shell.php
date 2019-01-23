@@ -13,49 +13,79 @@ class Shell extends Core {
     // Include required components
     use AssetPushing;
     use Date;
+    use Database;
     use Encryption;
     use FormHandling;
     use Git;
     use Logging;
+    use Permissions;
+    use Renderer;
+    use RateLimiting;
 
     /**
      * Shell constructor method
      */
-    function __construct($shell = null) {
+    function __construct() {
         parent::__construct();
-        $this->shell = $shell;
-        $this->name = "Core";
+        $this->logging = true;
+        $this->system_dirs = [
+            "/.git",
+            "/api/core",
+            "/api/shell",
+            "/less",
+            "/css/internal",
+            "/js/internal",
+            "/includes"
+        ];
+
+        $this->app = "Core";
         $this->separator = "-";
-        $this->patterns = array();
-        $this->data_paths = array(
-            "/data/",
-            "/data/logs/"
-        );
-        $this->pages = array(
-            "/" => ["Home", "home", "default"]
-        );
-        $this->errors = array(
-            "/error/403" => ["403 Forbidden", "error/403", "error"],
-            "/error/404" => ["404 Not Found", "error/404", "error"],
-            "/error/503" => ["503 Service Unavailable", "error/503", "error"]
-        );
-        $this->assets = array(
+        $this->patterns = [
+            // Contains at least one uppercase letter, one lowercase letter, one number and one special character
+            // Can contain any of the above
+            // Length: 8-64
+            'password' => '/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,64}$/'
+        ];
+
+        $this->asset_dirs = [
+            "/images",
+            "/fonts",
+            "/js",
+            "/css"
+        ];
+
+        new Page("/", "Home", "home", "default");
+        new Page("/test", "Home Child", "page", "default", "/");
+        new Page("/page", "Page", "page", "default");
+        new Page("/pageC", "Page", "pageC", "default");
+        new Page("/pageB", "Page", "page", "defaultB");
+        new Page("/pageCB", "Page", "pageC", "defaultB");
+
+        new Page("/error/403", "403 Forbidden", "error/403", "error");
+        new Page("/error/404", "404 Not Found", "error/404", "error");
+        new Page("/error/501", "501 Not Implemented", "error/501", "error");
+        new Page("/error/503", "503 Service Unavailable", "error/503", "error");
+
+        global $pages;
+        $this->pages = $pages;
+        unset($pages);
+
+        $this->assets = [
             "css/core.css" => "style"
-        );
+        ];
+
         // Push the assets for faster loading
         // Required HTTP/2.0 to be enabled in the server configuration file
         $this->pushAssets();
-        $this->createDataPaths();
+        $this->formatTitle();
     }
 
 }
-// Set the shell object name (for accessing in page segments and APIs)
-$shell = "core";
 // Initialize the Shell object using a variable variable
-$$shell = new Shell($shell);
+$core = new Shell();
 // Initialize the connection to the database (optional) ------- |
-$db = new Database($$shell, 'localhost', 'root', $shell); //    |  OPTIONAL DB
+$db = new DB('localhost', 'root', 'core'); //                   |  OPTIONAL DB
 // Link the shell object with the database for easy accessing   |  CONNECTION
-$$shell->linkDB($db); // -------------------------------------- |
+$core->linkDB($db); // ---------------------------------------- |
 // Render the page
-$$shell->renderPage();
+$core->renderPage();
