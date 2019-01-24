@@ -1,4 +1,7 @@
 # Core
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/98f395df51994bed8deabad17966640d)](https://app.codacy.com/app/ShtHappens796/Core?utm_source=github.com&utm_medium=referral&utm_content=ShtHappens796/Core&utm_campaign=Badge_Grade_Dashboard)
+
 The SHT Core is a placeholder for all my web projects based on a PHP backend along with an HTML/CSS/JS frontend.
 It provides an easy way to deploy new projects and maintain a core path in their development, allowing faster bug fixes and easier maintainability.
 
